@@ -8,22 +8,27 @@
 #include <iostream>
 #include <fstream>
 #include <string>
+#include <Windows.h>
+#include <mmsystem.h>
+#pragma comment(lib, "Winmm.lib")
 
 using namespace std;
 
 const int LOSE = 0, WIN = 1, PLAYING = 2;
-const int INITIAL = 0, WATERED = 1, HARVESTED = 3, GROWN = 4, DESTROYED = 5, LOCKED = 6, OPEN = 7, ON = 8, OFF = 9, DEAD = 10, FED = 11, EMPTY = 12, MOVED = 13, EATEN = 14, GIVEN = 15, USED = 16, BURNED = 17;
+const int INITIAL = 0, WATERED = 1, HARVESTED = 3, GROWN = 4, DESTROYED = 5, LOCKED = 6, OPEN = 7, OFF = 9, DEAD = 10, FED = 11, EMPTY = 12, MOVED = 13, EATEN = 14, GIVEN = 15, USED = 16, BURNED = 17;
 
-int doorState=LOCKED,radioState=INITIAL,selfExams=0,parrotState=INITIAL,plantState=INITIAL,rackState=INITIAL,bucketState=INITIAL,carpetState=INITIAL,ventState=INITIAL,paintingState=INITIAL,chestState=INITIAL,candleState=INITIAL,peanutState=INITIAL,lampState=INITIAL,keypadState=INITIAL,keyState=INITIAL,underwearState=INITIAL,bedState=INITIAL,forkState=INITIAL,ratState=INITIAL;
+int doorState=LOCKED,radioState=INITIAL,selfExams=0;
+int parrotState=INITIAL,plantState=INITIAL,rackState=INITIAL,bucketState=INITIAL,carpetState=INITIAL,ventState=INITIAL,paintingState=INITIAL,chestState=INITIAL,candleState=INITIAL,peanutStateL=INITIAL,lampState=INITIAL,keypadState=INITIAL,keyState=INITIAL,underwearState=INITIAL,bedState=INITIAL,forkState=INITIAL,ratState=INITIAL,peanutState=INITIAL;
 bool candleOnNightstand = true, lampLight = true, fire = true;
 
-int selectDifficulty(int maxMoves);
+int selectDifficulty(int& maxMoves);
 void displayRules();
 void roomDescription();
 void getCommand(string commandAction, string commandObject, string& command);
-void resultOfCommand(string command, int& gameStatus, string objectUsedOn);
-void statusUpdate(int maxMoves, int moves);
+void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& moves);
+void statusUpdate(int maxMoves, int& moves);
 void getObject(string& objectUsedOn);
+void displayEndScreen(int gameStatus, int maxMoves, int moves);
 
 
 
@@ -32,7 +37,7 @@ int main()
 {
 
   int gameStatus = PLAYING;
-  int maxMoves, moves = 0;
+  int maxMoves, moves;
   string commandAction, commandObject, command, objectUsedOn;
 
   cout << "Welcome to the Franklin Escape Room Game!" << endl;
@@ -51,20 +56,22 @@ int main()
 
   roomDescription();
 
-  cout << "--------------------------------------------------------------------------------------------------" << endl << endl;
+  cout << "--------------------------------------------------------------------------------------------------" << endl;
 
-  for (int move = 1; move <= maxMoves, gameStatus == PLAYING; move++)
+  for (moves = 1; moves <= maxMoves && gameStatus == PLAYING; moves++)
   {
-    getCommand(commandAction, commandObject, command);
-    resultOfCommand(command, gameStatus, objectUsedOn);
     statusUpdate(maxMoves, moves);
-  cout << "--------------------------------------------------------------------------------------------------" << endl << endl;
+    getCommand(commandAction, commandObject, command);
+    resultOfCommand(command, gameStatus, objectUsedOn, moves);
+    cout << "--------------------------------------------------------------------------------------------------" << endl;
   }
+
+  displayEndScreen(gameStatus, maxMoves, moves);
 
   return 0;
 }
 
-int selectDifficulty(int maxMoves)
+int selectDifficulty(int& maxMoves)
 {
   int difficulty;
 
@@ -93,7 +100,7 @@ int selectDifficulty(int maxMoves)
     maxMoves = 40;
   else if (difficulty == 3)
     maxMoves = 20;
-  else maxMoves = 9999;
+  else maxMoves = 10000;
 
   return difficulty;
 }
@@ -157,15 +164,49 @@ void getObject(string& objectUsedOn)
   objectUsedOn = ("on" + objectUsedOn);
 }
 
-void statusUpdate(int maxMoves, int moves)
+void statusUpdate(int maxMoves, int& moves)
 {
+  if ((maxMoves == 40)||(maxMoves == 20))
+    cout << "You have " << (maxMoves - moves + 1) << " moves left" << endl << endl;
 
+  if (radioState == DESTROYED)
+  {
+
+  }
 }
 
-void resultOfCommand(string command, int& gameStatus, string objectUsedOn)
+void displayEndScreen(int gameStatus, int maxMoves, int moves)
+{
+  if (gameStatus == WIN)
+  {
+    cout << "  __   __  _______  __   __    _     _  ___   __    _  __  " << endl;
+    cout << " |  | |  ||       ||  | |  |  | | _ | ||   | |  |  | ||  | " << endl;
+    cout << " |  |_|  ||   _   ||  | |  |  | || || ||   | |   |_| ||  | " << endl;
+    cout << " |       ||  | |  ||  |_|  |  |       ||   | |       ||  | " << endl;
+    cout << " |_     _||  |_|  ||       |  |       ||   | |  _    ||__| " << endl;
+    cout << "   |   |  |       ||       |  |   _   ||   | | | |   | __  " << endl;
+    cout << "   |___|  |_______||_______|  |__| |__||___| |_|  |__||__| " << endl;
+
+
+  }
+  else
+  {
+    cout << " __   __  _______  __   __    ___      _______  _______  _______  __  " << endl;
+    cout << "|  | |  ||       ||  | |  |  |   |    |       ||       ||       ||  | " << endl;
+    cout << "|  |_|  ||   _   ||  | |  |  |   |    |   _   ||  _____||    ___||  | " << endl;
+    cout << "|       ||  | |  ||  |_|  |  |   |    |  | |  || |_____ |   |___ |  | " << endl;
+    cout << "|_     _||  |_|  ||       |  |   |___ |  |_|  ||_____  ||    ___||__| " << endl;
+    cout << "  |   |  |       ||       |  |       ||       | _____| ||   |___  __  " << endl;
+    cout << "  |___|  |_______||_______|  |_______||_______||_______||_______||__| " << endl;
+
+    if (moves > maxMoves)
+      cout << "\nYou ran out of moves!" << endl;
+  }
+}
+
+void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& moves)
 {
   string answer;
-
 
   if (command == "examinebed")
     cout << "\nThe BED is size double, and it looks very clean and well kept. It was made neatly before you got out of it, but now\nthe covers and sheets are very disturbed and thrown about. There may have been something there that you missed." << endl;
@@ -1333,7 +1374,10 @@ cout << "\n" << endl;
 
 
   else
+  {
     cout << "-Invalid command- type help if you need a refresher on the rules" << endl;
+    moves--;
+  }
   //cerr << "checking the result of the command..." << endl;
   //    check result of command
   //cerr << "Updating variables.." << endl;
