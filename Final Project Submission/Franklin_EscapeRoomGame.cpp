@@ -12,21 +12,22 @@
 
 using namespace std;
 
-const int LOSE = 0, WIN = 1, PLAYING = 2;
+const int LOSE = 0, WIN = 1, PLAYING = 2; //const variables that represent is the player is playing, or if they won or lost the game
+//the following constants represent the different staes of the objects that can be changed by interacting with them
 const int INITIAL = 0, WATERED = 1, HARVESTED = 3, GROWN = 4, DESTROYED = 5, OPEN = 7, OFF = 9, DEAD = 10, FED = 11, EMPTY = 12, MOVED = 13, EATEN = 14, GIVEN = 15, USED = 16, BURNED = 17;
-
+//the following are variables for the states of the objects, and are initialized to their original state in the game
 int selfExams=0;
 int radioState=INITIAL,doorState=INITIAL,parrotState=INITIAL,plantState=INITIAL,rackState=INITIAL,bucketState=INITIAL,carpetState=INITIAL,ventState=INITIAL,paintingState=INITIAL,chestState=INITIAL,candleState=INITIAL,peanutStateL=INITIAL,lampState=INITIAL,keypadState=INITIAL,keyState=INITIAL,underwearState=INITIAL,bedState=INITIAL,forkState=INITIAL,ratState=INITIAL,peanutState=INITIAL;
 bool candleOnNightstand = true, lampLight = true, fire = true, riddle = false;
 
-int selectDifficulty(int& maxMoves);
-void displayRules();
-void roomDescription();
-void getCommand(string commandAction, string commandObject, string& command);
-void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& moves);
-void statusUpdate(int maxMoves, int& moves);
-void getObject(string& objectUsedOn);
-void displayEndScreen(int gameStatus, int maxMoves, int moves);
+int selectDifficulty(int& maxMoves); //allows the user to choose their desired difficulty
+void displayRules(); //displays the rules of the game if the player needs help
+void roomDescription(); //gives the initial description of the room
+void getCommand(string commandAction, string commandObject, string& command); //gets the user's command: action and object
+void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& moves); //updates the game and shows the result based on the command the user entered
+void statusUpdate(int maxMoves, int& moves); //shows the player how many moves they have left
+void getObject(string& objectUsedOn); //gets the objects being used on for the "use" action
+void displayEndScreen(int gameStatus, int maxMoves, int moves); //displays an end screen based on if the player won or lost
 
 
 
@@ -34,49 +35,49 @@ void displayEndScreen(int gameStatus, int maxMoves, int moves);
 int main()
 {
 
-  int gameStatus = PLAYING;
-  int maxMoves, moves;
-  string commandAction, commandObject, command, objectUsedOn;
+  int gameStatus = PLAYING; //sets the game's state to playing, because it just started
+  int maxMoves, moves; //variables representing the max number of moves the player has and how many they've used already
+  string commandAction, commandObject, command, objectUsedOn; //strings that user input is entered into to get commands
 
-  cout << "Welcome to the Franklin Escape Room Game!" << endl;
+  cout << "Welcome to the Franklin Escape Room Game!" << endl; //welcome message
   cout << "This is a text-based game in which the user enters commands in an attempt to escape the room" << endl  << endl;
 
-  displayRules();
+  displayRules(); //displays the rules of the game if the player needs help
 
   cout << "--------------------------------------------------------------------------------------------------" << endl << endl;
 
-  selectDifficulty(maxMoves);
-
+  selectDifficulty(maxMoves); //allows the user to choose their desired difficulty
+  //Introduction to the game once the difficulty has been selected
   cout << "--------------------------------------------------------------------------------------------------" << endl << endl;
   cout << "You awake to the sound of a funky tune suddenly starting up." << endl;
   cout << "Still sleepy, you sit up, only to realize this isn't your BED" << endl;
   cout << "You get out of the BED and quickly realize that this isn't your ROOM either" << endl << endl;
 
-  roomDescription();
+  roomDescription(); //gives the initial description of the room
 
   cout << "--------------------------------------------------------------------------------------------------" << endl;
 
-  for (moves = 1; moves <= maxMoves && gameStatus == PLAYING; moves++)
+  for (moves = 1; moves <= maxMoves && gameStatus == PLAYING; moves++) //loop that repeats for every action taken
   {
-    statusUpdate(maxMoves, moves);
-    getCommand(commandAction, commandObject, command);
-    resultOfCommand(command, gameStatus, objectUsedOn, moves);
+    statusUpdate(maxMoves, moves); //shows the player how many moves they have left
+    getCommand(commandAction, commandObject, command); //gets the user's command: action and object
+    resultOfCommand(command, gameStatus, objectUsedOn, moves); //updates the game and shows the result based on the command the user entered
     cout << "--------------------------------------------------------------------------------------------------" << endl;
   }
 
-  displayEndScreen(gameStatus, maxMoves, moves);
+  displayEndScreen(gameStatus, maxMoves, moves); //displays an end screen based on if the player won or lost
 
   return 0;
 }
 
-int selectDifficulty(int& maxMoves)
+int selectDifficulty(int& maxMoves) //allows the user to choose their desired difficulty
 {
   int difficulty;
 
   cout << "To begin, first select your desired difficulty" << endl;
 
   do
-  {
+  { //menu for difficulty selection repeats if the user does not enter 1, 2, or 3
     cout << "\n1.) Easy -no action limit-" << endl;
     cout << "2.) Medium -40 action limit-" << endl;
     cout << "3.) Hard -20 action limit-" << endl;
@@ -84,7 +85,7 @@ int selectDifficulty(int& maxMoves)
     cout << "Enter difficulty 1 through 3: ";
     cin >> difficulty;
 
-    if (cin.fail() || ((difficulty != 1) && (difficulty != 2) && (difficulty != 3)))
+    if (cin.fail() || ((difficulty != 1) && (difficulty != 2) && (difficulty != 3))) //clears for invalid input
     {
       cin.clear();
       cin.ignore(100, '\n');
@@ -95,7 +96,7 @@ int selectDifficulty(int& maxMoves)
 
   cout << "You have selcted difficulty " << difficulty << endl;
 
-  if (difficulty == 2)
+  if (difficulty == 2) //sets max number of moves based on difficulty choice
     maxMoves = 40;
   else if (difficulty == 3)
     maxMoves = 20;
@@ -104,7 +105,7 @@ int selectDifficulty(int& maxMoves)
   return difficulty;
 }
 
-void displayRules()
+void displayRules() //displays the rules of the game in the beginning and when the user types 'game help'
 {
   cout << "This game works by the player entering two words every turn." << endl;
   cout << "The first word is an action, and the second is the object that is being acted upon" << endl << endl;
@@ -112,10 +113,10 @@ void displayRules()
   cout << "Examine, Consume, Attack, Search, Take, Enter, Use" << endl;
   cout << "Objects that can be interacted with are capitalized, e.g. LAMP" << endl;
   cout << "An example of a valid command would be: 'examine lamp'" << endl << endl;
-  cout << "You can enter the command 'help' to display this information again" << endl;
+  cout << "You can enter the command 'game help' to display this information again" << endl;
 }
 
-void roomDescription()
+void roomDescription() //gives an initial description of the room
 {
   cout << "Looking around, you see that you are in a ROOM about the size of a standard living room. There is a large CARPET on" << endl;
   cout << "the FLOOR that you stood on when you first got out of the BED. The BED is in one corner, and next to it is a" << endl;
@@ -128,47 +129,46 @@ void roomDescription()
   cout << "the TABLE is the RADIO that woke you up and a silver FORK." << endl;
 }
 
-void getCommand(string commandAction, string commandObject, string& command)
+void getCommand(string commandAction, string commandObject, string& command)//gets user command for that turn
 {
-  cin >> commandAction >> commandObject;
-  //cout << commandAction << commandObject << endl;
-  command = (commandAction + commandObject);
-  //cout << command.size() << endl;
+  cin >> commandAction >> commandObject; //the action and object are seperated
+
+  command = (commandAction + commandObject); //then combined again
+
   int commandSize = command.size();
 
   char commandLetters[commandSize];
 
-  for (int index = 0; index < commandSize; index++)
+  for (int index = 0; index < commandSize; index++) //it is then converted to all lowercase so it can be compared with the expected results
   {
     command[index] = tolower(command[index]);
   }
-  // cout << command;
 }
 
-void getObject(string& objectUsedOn)
+void getObject(string& objectUsedOn) //gets user input for the object being used on for the 'use' action
 {
-  cin >> objectUsedOn;
+  cin >> objectUsedOn; //gets user input
 
   int objectSize = objectUsedOn.size();
 
   char objectLetters[objectSize];
 
-  for (int index = 0; index < objectSize; index++)
+  for (int index = 0; index < objectSize; index++) //it is then converted to all lowercase so it can be compared with the expected results
   {
     objectUsedOn[index] = tolower(objectUsedOn[index]);
   }
-  objectUsedOn = ("on" + objectUsedOn);
+  objectUsedOn = ("on" + objectUsedOn); //adds "on" to the beginning to set it apart from just the name of the object
 }
 
-void statusUpdate(int maxMoves, int& moves)
+void statusUpdate(int maxMoves, int& moves) //shows the player how many moves they have left if they have any
 {
   if ((maxMoves == 40)||(maxMoves == 20))
     cout << "You have " << (maxMoves - moves + 1) << " moves left" << endl << endl;
 }
 
-void displayEndScreen(int gameStatus, int maxMoves, int moves)
+void displayEndScreen(int gameStatus, int maxMoves, int moves) //displays a big end game message once the player wins or loses
 {
-  if (gameStatus == WIN)
+  if (gameStatus == WIN) //if the player successfully escapes
   {
     cout << "  __   __  _______  __   __    _     _  ___   __    _  __  " << endl;
     cout << " |  | |  ||       ||  | |  |  | | _ | ||   | |  |  | ||  | " << endl;
@@ -180,7 +180,7 @@ void displayEndScreen(int gameStatus, int maxMoves, int moves)
 
 
   }
-  else
+  else //if the player dies or runs out of turns
   {
     cout << " __   __  _______  __   __    ___      _______  _______  _______  __  " << endl;
     cout << "|  | |  ||       ||  | |  |  |   |    |       ||       ||       ||  | " << endl;
@@ -195,10 +195,10 @@ void displayEndScreen(int gameStatus, int maxMoves, int moves)
   }
 }
 
-void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& moves)
+void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& moves) //displays the result of the user's command and updates the object states accordingly
 {
-  string answer;
-  int num;
+  string answer; //string variable to get the user's answer to the old man's riddle
+  int num; //int variable used to get the user's entry into the keypad
 
   if (command == "examinebed")
     cout << "\nThe BED is size double, and it looks very clean and well kept. It was made neatly before you got out of it, but now\nthe covers and sheets are very disturbed and thrown about. There may have been something there that you missed." << endl;
@@ -213,7 +213,7 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
   else if (command == "searchbed")
   {
     if (underwearState == INITIAL)
-      cout << "\nRustling through the BED, you find a pair of underwear mixed in with the sheets. You really don't want to think about\nwhere this came from." << endl;
+      cout << "\nRustling through the BED, you find a pair of UNDERWEAR mixed in with the sheets. You really don't want to think about\nwhere this came from." << endl;
     else cout << "\nYou find nothing else of interest in the BED, save for a few weird stains." << endl;
   }
   else if (command == "takebed")
@@ -465,7 +465,7 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
       getObject(objectUsedOn);
 
       if (objectUsedOn == "onfloor")
-        cout << "\nYou play the RADIO near the FLOOR, and you thinkn you might hear something near the CARPET." << endl;
+        cout << "\nYou play the RADIO near the FLOOR, and you think you might hear something near the CARPET." << endl;
       else if (objectUsedOn == "onfireplace")
       {
         if (fire = true)
@@ -743,7 +743,21 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
       }
     }
     else if (objectUsedOn == "onman")
-      cout << "The man is not interested in the PARROT." << endl;
+    {
+      if (underwearState == INITIAL)
+        cout << "\nThe MAN clearly does not want that." << endl;
+      else if (underwearState == GIVEN)
+      {
+        if (parrotState == INITIAL)
+          cout << "The MAN looks intently at the PARROT, but after a while, he says you have to feed the PARROT before it talks to you." << endl;
+        else if (parrotState == FED)
+        {
+          cout << "\nThe PARROT looks at the MAN and squawks the word 'Hello'. The man cheers loudly and exclaims you've solved his riddle.\nHe unlocks the gate and beckons you to escape by entering the FLOOR." << endl;
+          riddle = true;
+        }
+        else cout << "\nThe man looks at the dead PARROT and shakes his head, saying: 'Now you'll never know what animals would say'" << endl;
+      }
+    }
     else cout << "That does not do anything." << endl;
   }
 
@@ -814,7 +828,11 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
       bucketState = EMPTY;
     }
     else if ((objectUsedOn == "onparrot")&&(bucketState == INITIAL))
-      cout << "\nYou try to throw some water on the PARROT, but it dodges." << endl;
+    {
+      if ((parrotState == INITIAL)||(parrotState == FED))
+        cout << "\nYou try to throw some water on the PARROT, but it dodges." << endl;
+      else cout << "\nYou dump some water on the PARROT's corpse." << endl;
+    }
     else if ((objectUsedOn == "oncandle")&&(bucketState == INITIAL)&&(candleState == BURNED))
     {
       cout << "\nYou pour some water on the CANDLE, extinguishing its flame." << endl;
@@ -934,6 +952,8 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
     {
       cout << "\nYou burn up the painting with the CANDLE's flame in many different places. It then falls off the wall, and appears\ncompletely destroyed now." << endl;
     }
+    else if (candleState == DESTROYED)
+      cout << "\nThe candle has already been destroyed. You cannot use it anymore." << endl;
     else if (objectUsedOn == "onman")
       cout << "\nThe MAN does not seem interested in the CANDLE at all." << endl;
     else if (objectUsedOn == "onroom")
@@ -958,7 +978,7 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
   {
     if (carpetState == INITIAL)
     {
-      cout << "\nYou attack the CARPET, moving it to the side and revealing a gated hole in the FLOOR. On the other side of the gate is a bearded, naked, old MAN. He says to you: If you give me something valuable and answer my riddle, I will let you out of here." << endl;
+      cout << "\nYou attack the CARPET, moving it to the side and revealing a gated hole in the FLOOR. On the other side of the gate\nis a bearded, naked, old MAN. He says to you: If you give me something valuable and answer my riddle, I will let you\nout of here." << endl;
       carpetState = MOVED;
     }
     else cout << "\nYou punch the CARPET into the WALL a few times." << endl;
@@ -967,7 +987,7 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
   {
     if (carpetState == INITIAL)
     {
-      cout << "\nYou search the CARPET, moving it to the side and revealing a gated hole in the FLOOR. On the other side of the gate is a bearded, naked, old MAN. He says to you: If you give me something valuable and answer my riddle, I will let you out of here." << endl;
+      cout << "\nYou search the CARPET, moving it to the side and revealing a gated hole in the FLOOR. On the other side of the gate is\na bearded, naked, old MAN. He says to you: If you give me something valuable and answer my riddle, I will let you out\nof here." << endl;
       carpetState = MOVED;
     }
     else cout << "\nThere is nothing else to find within the CARPET." << endl;
@@ -1257,16 +1277,24 @@ void resultOfCommand(string command, int& gameStatus, string objectUsedOn, int& 
   }
   else if (command == "consumechest")
     cout << "\nYou fail to consume the CHEST. It is simply too big." << endl;
-  else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
+  else if (command == "attackchest")
+    cout << "\nThis CHEST is extremely sturdy, and you can't do any damage to it. It's like it was meant to keep out pirates." << endl;
+  else if (command == "searchchest")
+  {
+    if (chestState == OPEN)
+      cout << "\nIn the CHEST, you find stacks upon stacks of gold COINS. It has got to be worth a fortune." << endl;
+    else cout << "\nThe CHEST is locked. You cannot search through it until you unlock it." << endl;
+  }
+  else if (command == "takechest")
+    cout << "\nThe CHEST is too heavy to take with you, even if it was empty." << endl;
+  else if (command == "enterchest")
+  {
+    if (chestState == INITIAL)
+      cout << "\nYou cannot enter the CHEST. It is locked shut." << endl;
+    else cout << "\nYou sit in the CHEST and let the gold COINS flow over you. It's like you are taking a coin bath." << endl;
+  }
+  else if (command == "usechest")
+    cout << "\nThe CHEST is already in use by the seemingly endless amount of gold COINS stored within it." << endl;
 
 
 
@@ -1276,16 +1304,16 @@ cout << "\n" << endl;
     cout << "\nThe RACK opened up a small HOLE in the FLOOR. It seems like the HOLE was there before, but it was hastily covered up. You\ncan't tell for sure, but it seems like a good place to hide something." << endl;
   else if (command == "consumehole")
     cout << "\nThat's... not how this works. You can't consume a hole... it's negative space. There's nothing to consume! Please, I don't\nunderstand!" << endl;
-    else if (command == "")
-    cout << "\n" << endl;
-    else if (command == "")
-  cout << "\n" << endl;
-  else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
+  else if (command == "attackhole")
+    cout << "\nYou attack the HOLE, making it very slightly bigger." << endl;
+  else if (command == "searchhole")
+    cout << "\nIn the HOLE, you found a KEY. The KEY looks like it could be used to unlock something." << endl;
+  else if (command == "takehole")
+    cout << "\nLook, you... wait, what? You can't take the HOLE. It's nothing." << endl;
+  else if (command == "enterhole")
+    cout << "\nYou can only fit one hand into the HOLE." << endl;
+  else if (command == "usehole")
+    cout << "\n...Maybe you should by it a drink first." << endl;
 
 
 
@@ -1304,23 +1332,72 @@ cout << "\n" << endl;
       cout << "\nYou eat the peanut, but it is not as tasty as you had hoped it would be." << endl;
       peanutState = EATEN;
     }
-    else if (peanutState == GIVEN)
-      cout << "\nThe PARROT has already eaten the PEANUT." << endl;
     else if (peanutState == EATEN)
-      cout << "\nYou already ate the PEANUT." << endl;
+      cout << "\nThe PEANUT has already been eaten." << endl;
     else if (peanutState == DESTROYED)
       cout << "\nThe PEANUT is no more..." << endl;
   }
-  else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
+  else if (command == "attackpeanut")
+  {
+    if (peanutState == INITIAL)
+    {
+      cout << "\nYou crush the PEANUT inbetween your hands. Wow, you're so strong!" << endl;
+      peanutState = DESTROYED;
+    }
+    else cout << "\nThe peanut is already gone." << endl;
+  }
+  else if (command == "searchpeanut")
+  {
+    if (peanutState == INITIAL)
+      cout << "\nYou are pretty sure there is a PEANUT inside the PEANUT shell" << endl;
+    else cout << "\nYou can no longer search the PEANUT. It has been destroyed." << endl;
+  }
+  else if (command == "takepeanut")
+  {
+    if (peanutState == INITIAL)
+      cout << "\nYou are now carrying the PEANUT." << endl;
+    else if (peanutState == DESTROYED)
+      cout << "\nThe PEANUT has been destroyed. You can no longer take it with you." << endl;
+    else cout << "\nThe PEANUT has been eaten. You can no longer take it." << endl;
+  }
+  else if (command == "enterpeanut")
+    cout << "\nPeanuts are waaaay too small to enter." << endl;
+  else if (command == "usepeanut")
+  {
+    cout << "\nWhat would you like to use the PEANUT on? ";
+    getObject(objectUsedOn);
+
+    if ((objectUsedOn == "onplant")&&(peanutState == INITIAL))
+      cout << "\nThat's where the PEANUT came from in the first place. You can't just return it." << endl;
+    else if ((objectUsedOn == "onfireplace")&&(peanutState == INITIAL))
+    {
+      cout << "\nYou throw the PEANUT into the fire, burning it to a crisp." << endl;
+      peanutState == DESTROYED;
+    }
+    else if ((objectUsedOn == "onself")&&(peanutState == INITIAL))
+      cout << "\nWhat, how? If you want to eat it, just consume it." << endl;
+    else if ((objectUsedOn == "onparrot")&&(peanutState == INITIAL)&&(parrotState == INITIAL))
+    {
+      if ((parrotState == INITIAL)||(parrotState == FED))
+      {
+        cout << "\nYou toss the PEANUT to the PARROT, and it catches it in mid-air. It cracks it open and eats it up. It seems to have\nreally enjoyed it. It looks at you and says: 'Hello'" << endl;
+        peanutState = EATEN;
+        parrotState = FED;
+      }
+      else cout << "\nThe PARROT is dead. It no longer wants the PEANUT." << endl;
+    }
+    else if ((objectUsedOn == "onbucket")&&(peanutState == INITIAL)&&(bucketState == INITIAL))
+     cout << "\nYou stick the PEANUT in the water, but all that accomplishes it making it wet." << endl;
+    else if ((objectUsedOn == "onrats")&&(peanutState == INITIAL))
+      cout << "\nThe RATS do not seem at all interested in the PEANUT." << endl;
+    else if ((objectUsedOn == "onman")&&(peanutState == INITIAL))
+      cout << "\nThe man looks at the PEANUT and tells you that isn't what he wants. Then, he turns and points toward where the PARROT was." << endl;
+    else if (peanutState == EATEN)
+      cout << "\nThe PEANUT has been eaten. You cannot use it anymore." << endl;
+    else if (peanutState == DESTROYED)
+      cout << "\nThe PEANUT has been destroyed. You cannot use it anymore." << endl;
+    else cout << "\nThat does not do anything." << endl;
+  }
 
 
 
@@ -1344,16 +1421,40 @@ cout << "\n" << endl;
       keyState = EATEN;
     }
   }
-  else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
+  else if (command == "attackkey")
+    cout << "\nThe KEY is unaffected by your attacks." << endl;
+  else if (command == "searchkey")
+    cout << "\nThere is nothing within the KEY to search." << endl;
+  else if (command == "takekey")
+    cout << "\nYou are now carrying the KEY." << endl;
+  else if (command == "enterkey")
+    cout << "\nNo, no, no. It's the KEY that is supposed to enter things." << endl;
+  else if (command == "usekey")
+  {
+    cout << "\nWhat would you like to use the KEY on? ";
+    getObject(objectUsedOn);
+
+    if ((objectUsedOn == "ondoor")&&(keyState == INITIAL))
+      cout << "\nThe DOOR is not opened with a KEY." << endl;
+    else if ((objectUsedOn == "onnightstand")&&(keyState == INITIAL))
+      cout << "\nThe NIGHTSTAND isn't even locked." << endl;
+    else if ((objectUsedOn == "onself")&&(keyState == INITIAL))
+      cout << "\nThe key to your heart lies elsewhere." << endl;
+    else if ((objectUsedOn == "onvent")&&(keyState == INITIAL))
+      cout << "\nThe VENT is only able to be opened by unscrewing it." << endl;
+    else if ((objectUsedOn == "onoutlet")&&(keyState == INITIAL))
+      cout << "\nThe KEY almost fits into the OUTLET, but it isn not quite thin enough." << endl;
+    else if ((objectUsedOn == "onkeypad")&&(keyState == INITIAL))
+      cout << "\nYou know, just because it's called a KEYPAD doesn't mean it's opened by a key." << endl;
+    else if ((objectUsedOn == "onchest")&&(chestState == INITIAL)&&(keyState == INITIAL))
+    {
+      cout << "\nYou successfully open up the CHEST with the KEY. Inside it, you find it practically overflowing with gold COINS which\nlook very valuable." << endl;
+      chestState = OPEN;
+    }
+    else if (keyState == EATEN)
+      cout << "\nYou already ate the freaking KEY!" << endl;
+    else cout << "\nThat does not do anything." << endl;
+  }
 
 
 
@@ -1363,16 +1464,47 @@ cout << "\n" << endl;
     cout << "\nThe gold COINS give off a glow and a shine, and you can tell they are very valuable. The sides of each coin are beautifully\ncarved and decorated, and the edges are very smooth, like a flathead screwdriver" << endl;
   else if (command == "consumecoins")
     cout << "\nYou swallow a handful of gold COINS. They do not rest easy in your stomach. You feel much heavier." << endl;
-    else if (command == "")
-    cout << "\n" << endl;
-    else if (command == "")
-  cout << "\n" << endl;
-  else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
+  else if (command == "attackcoins")
+    cout << "\nYou can't so much as bend the COINS, even with all of your strength." << endl;
+  else if (command == "searchcoins")
+    cout << "\nThe gold COINS give off a glow and a shine, and you can tell they are very valuable. The sides of each coin are beautifully\ncarved and decorated, and the edges are very smooth, like a flathead screwdriver" << endl;
+  else if (command == "takecoins")
+    cout << "\nYou take a handful of COINS and stuff them into your clothes." << endl;
+  else if (command == "entercoins")
+    cout << "\nThat just does not make any sense, dude." << endl;
+  else if (command == "usecoins")
+  {
+    cout << "\nWhat would you like to use the COINS on? ";
+    getObject(objectUsedOn);
+
+    if (objectUsedOn == "onfireplace")
+      cout << "\nYou throw some coins into the FIREPLACE for no reason." << endl;
+    else if (objectUsedOn == "onparrot")
+    {
+      if ((parrotState == INITIAL)||(parrotState == FED))
+        cout << "\nThe PARROT does not seem interested in the COINS at all." << endl;
+      else cout << "\nThe PARROT is dead!!" << endl;
+    }
+    else if (objectUsedOn == "onbucket")
+      cout << "\nThe COINS are already squeaky clean." << endl;
+    else if (objectUsedOn == "onvent")
+    {
+      if (ventState == INITIAL)
+      {
+        cout << "\nYou put a coin up to the VENT's screws and use the COINS to unscrew the VENT cover. Once the cover falls off, you see\nin the VENT a literal ton of RATS blocking your path out." << endl;
+        ventState = OPEN;
+      }
+      else cout << "\nYou already opened the VENT." << endl;
+    }
+    else if (objectUsedOn == "onrats")
+      cout << "\nThe RATS are not at all interested in the COINS." << endl;
+    else if (objectUsedOn == "onoutlet")
+      cout << "\nYou are able to kinda stick a coin in the OUTLET, but it soon falls out." << endl;
+    else if (objectUsedOn == "onman")
+      cout << "\nThe MAN spits on you for even offering such an item." << endl;
+    else if (objectUsedOn == "onhole")
+      cout << "\nYou stick a few COINS in the HOLE. Yippee!" << endl;
+  }
 
 
 
@@ -1394,16 +1526,64 @@ cout << "\n" << endl;
     else if (underwearState == EATEN)
       cout << "\nI still can't believe you actually ate that underwear." << endl;
   }
-    else if (command == "")
-    cout << "\n" << endl;
-    else if (command == "")
-  cout << "\n" << endl;
-  else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
+  else if (command == "attackunderwear")
+    cout << "\nYou pull on the UNDERWEAR with all of your strength, but only manage to stretch it out a bit" << endl;
+  else if (command == "searchunderwear")
+    cout << "\nThis is so gross...You stick your hand in the UNDERWEAR and feel around, but you don't find anything." << endl;
+  else if (command == "takeunderwear")
+    cout << "\nAs nasty as it is, you are now carrying the UNDERWEAR with you." << endl;
+  else if (command == "enterunderwear")
+    cout << "\nI'm just gonna say that the UNDERWEAR is too small for you to put on." << endl;
+  else if (command == "useunderwear")
+  {
+    cout << "\nWhat would you like to use the UNDERWEAR on? ";
+    getObject(objectUsedOn);
+
+    if ((objectUsedOn == "onbed")&&(underwearState == INITIAL))
+      cout << "\nThat is where the UNDERWEAR came from in the first place." << endl;
+    else if ((objectUsedOn == "onplant")&&(underwearState == INITIAL))
+    {
+      if ((plantState == DESTROYED)||(plantState == BURNED))
+        cout << "\nThe PLANT has already been destroyed." << endl;
+      else if (plantState == EATEN)
+        cout << "\nYou ate the PLANT, remember?" << endl;
+      else cout << "\nYou throw the UNDERWEAR on the PLANT, but then you realize the PLANT probably doesn't like it, so you take it off." << endl;
+    }
+    else if ((objectUsedOn == "onfireplace")&&(underwearState == INITIAL)&&(fire == true))
+    {
+      cout << "\nYou throw the UNDERWEAR into the FIREPLACE, and after a while, it catches on fire and burns up." << endl;
+      underwearState = DESTROYED;
+    }
+    else if ((objectUsedOn == "onself")&&(underwearState == INITIAL))
+      cout << "\nNope, i'm not gonna let you do that." << endl;
+    else if ((objectUsedOn == "onparrot")&&(underwearState == INITIAL))
+    {
+      if ((parrotState == INITIAL)||(parrotState == FED))
+        cout << "\nThe PARROT pecks at the UNDERWEAR a bit, then gets bored." << endl;
+      else cout << "\nYou throw the UNDERWEAR over the PARROT's corpse. Now it smells even worse." << endl;
+    }
+    else if ((objectUsedOn == "onbucket")&&(underwearState == INITIAL)&&(bucketState == INITIAL))
+      cout << "\nYou dump the UNDERWEAR into the water BUCKET, letting it absorb the water. Then you wring it out back into the BUCKET." << endl;
+    else if ((objectUsedOn == "oncandle")&&(underwearState == INITIAL)&&(candleState == BURNED))
+    {
+      cout << "\nAfter a while, the UNDERWEAR catches on fire and burns up. It is now destroyed." << endl;
+      underwearState = DESTROYED;
+    }
+    else if ((objectUsedOn == "onrats")&&(underwearState == INITIAL))
+      cout << "\nThe Rats do not care about the UNDERWEAR at all." << endl;
+    else if ((objectUsedOn == "onman")&&(underwearState == INITIAL))
+    {
+      cout << "\nThe MAN exclaims that this is exactly the valuable thing he was searching for. Now, he says, you must solve his riddle\nto escape: 'If you could talk to animals, what's the first thing they would say?'" << endl;
+      underwearState = GIVEN;
+    }
+    else if (underwearState == DESTROYED)
+      cout << "\nThe UNDERWEAR has been destroyed. You cannot use it on anything." << endl;
+    else if (underwearState == EATEN)
+      cout << "\nYou already ate the UNDERWEAR. You can't use it on anything." << endl;
+    else if (underwearState == GIVEN)
+      cout << "\nYou already gave the old MAN the UNDERWEAR. You can't use it anymore." << endl;
+    else cout << "\nThat does not do anything." << endl;
+  }
 
 
 
@@ -1413,24 +1593,58 @@ cout << "\n" << endl;
     cout << "\nThe FORK is a metallic silver color, just like standard silverware you would find in a restaurant. It looks like it might be\nable to fit somewhere..." << endl;
   else if (command == "consumefork")
   {
-    if (forkState == DESTROYED)
-      cout << "\nThe FORK is no more..." << endl;
-    else
+    cout << "\nYou choke on the fork and die. Serves you right!" << endl;
+    gameStatus = LOSE;
+  }
+  else if (command == "attackfork")
+    cout << "\nYou bend the FORK by using all of your strength. That'll show it!" << endl;
+  else if (command == "searchfork")
+    cout << "\nYou don't find anything in the FORK." << endl;
+  else if (command == "takefork")
+    cout << "\nYou are currently carrying the FORK." << endl;
+  else if (command == "enterfork")
+    cout << "\nYou can see your reflection in the FORK, so that's almost like being inside of it." << endl;
+  else if (command == "usefork")
+  {
+    cout << "\nWhat will you use the FORK on?" << endl;
+    getObject(objectUsedOn);
+
+    if (objectUsedOn == "ondoor")
+      cout << "\nThe FORK cannot pierce the DOOR." << endl;
+    else if (objectUsedOn == "onfloor")
+      cout << "\nYou can't just dig your way out of here." << endl;
+    else if (objectUsedOn == "onradio")
+      cout << "\nYou cannot destroy the RADIO with the FORK. It is too sturdy." << endl;
+    else if ((objectUsedOn == "onfireplace")&&(fire == true))
+      cout << "\nYou hold the fork up to the FIREPLACE, but the fire is not hot enough to melt it." << endl;
+    else if (objectUsedOn == "onself")
     {
-      cout << "\nYou choke on the fork and die. Serves you right!" << endl;
+      cout << "\nYou stab your SELF in the eye with the FORK and bleed out and die." << endl;
       gameStatus = LOSE;
     }
+    else if (objectUsedOn == "onparrot")
+    {
+      if ((parrotState == INITIAL)||(parrotState == FED))
+      {
+        cout << "\nYou stab the PARROT with the FORK, killing it." << endl;
+        parrotState = DEAD;
+      }
+      else cout << "\nYou stab the dead PARROT." << endl;
+    }
+    else if ((objectUsedOn == "onvent")&&(ventState == INITIAL))
+      cout << "\nYou can almost fit the FORK into the vent, but it won't fit. And you cant use it to unscrew the VENT either.\nYou'd need something like a coin." << endl;
+    else if (objectUsedOn == "onrats")
+      cout << "\nYou stab a few of the RATS, killing them, but more immediately take their place." << endl;
+    else if (objectUsedOn == "onoutlet")
+    {
+      cout << "\nYou stick the FORK into the OUTLET. It fits perfectly. You are then electrocuted and you die." << endl;
+      gameStatus = LOSE;
+    }
+    else if (objectUsedOn == "onman")
+      cout << "\nThe MAN does not wantthe FORK, and you are not able to reach him to attack him." << endl;
+    else if (objectUsedOn == "onchest")
+      cout << "\nYou cannot pick the lock on the CHEST with the FORK." << endl;
   }
-    else if (command == "")
-    cout << "\n" << endl;
-    else if (command == "")
-  cout << "\n" << endl;
-  else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
-else if (command == "")
-cout << "\n" << endl;
 
 
 
@@ -1439,17 +1653,39 @@ cout << "\n" << endl;
 
   else if (command == "examineroom")
   {
-    cout << "\nYou recall what the room looked like when you first examined it:" << endl;
+    cout << "\nYou recall what the ROOM looked like when you first examined it:" << endl;
     roomDescription();
   }
   else if (command == "consumeroom")
-    cout << "Dude... really?" << endl;
+    cout << "\nDude... really?" << endl;
+  else if (command == "attackroom")
+    cout << "\nYou can't just go punching around everything willy nilly. Be specific!" << endl;
+  else if (command == "searchroom")
+  {
+    cout << "\nYou recall what the ROOM looked like when you first examined it:" << endl;
+    roomDescription();
+  }
+  else if (command == "takeroom")
+    cout << "\nYou are trying to escape the ROOM, not take it." << endl;
+  else if (command == "enterroom")
+    cout << "\nYou are already inside of the ROOM. You are trying to escape, remember?" << endl;
+  else if (command == "useroom")
+    cout << "\nYou have to be more specific. Specify what in the ROOM you want to use." << endl;
 
 
+  else if (command == "gamehelp")
+  {
+    displayRules();
+    cout << endl;
+    moves--;
+  }
 
   else
   {
     cout << "-Invalid command- type 'help' if you need a refresher on the rules" << endl;
     moves--;
   }
+
+  cin.clear();
+  cin.ignore(100, '\n');
 }
